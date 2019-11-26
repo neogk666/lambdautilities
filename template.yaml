@@ -1,0 +1,132 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'Lambda Utilities'
+Globals:
+    Function:
+      Runtime: python3.7
+    Api:
+      OpenApiVersion: '2.0'
+Resources:
+  ApiResource:
+    Type: 'AWS::Serverless::Api'
+    Properties:
+      StageName: prod
+      EndpointConfiguration: REGIONAL
+  LambdaStatFn:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: 'lamstatv3.lambda_handler'
+      CodeUri: 's3://mohanias-cfn/lamstatv3.zip'
+      Description: 'Lambda Statistics Function'
+      MemorySize: 3008
+      Timeout: 29
+      Role: !GetAtt LambdaStatRole.Arn
+      Events:
+        LambdaAPI:
+          Type: Api
+          Properties:
+            Path: /find
+            Method: GET
+            RestApiId: !Ref ApiResource
+  LambdaEdgeFn:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: 'findlelogsv3.lambda_handler'
+      CodeUri: 's3://mohanias-cfn/findlelogsv3.zip'
+      Description: 'Lambda Edge Log Finder Function'
+      MemorySize: 3008
+      Timeout: 29
+      Role: !GetAtt LambdaStatRole.Arn
+      Events:
+        LambdaAPI:
+          Type: Api
+          Properties:
+            Path: /edgelogs
+            Method: GET
+            RestApiId: !Ref ApiResource
+  LambdaENIListFn:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: 'enilist.lambda_handler'
+      CodeUri: 's3://mohanias-cfn/enilist.zip'
+      Description: 'Lambda ENI List Function'
+      MemorySize: 1024
+      Timeout: 29
+      Role: !GetAtt LambdaStatRole.Arn
+      Events:
+        LambdaAPI:
+          Type: Api
+          Properties:
+            Path: /listeni
+            Method: GET
+            RestApiId: !Ref ApiResource
+  LambdaENIDelFn:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: 'enidel.lambda_handler'
+      CodeUri: 's3://mohanias-cfn/enidel.zip'
+      Description: 'Lambda ENI Delete Function'
+      MemorySize: 256
+      Timeout: 900
+      Role: !GetAtt LambdaStatRole.Arn
+  LambdaFormFn:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: 'formv3.lambda_handler'
+      Policies: AWSLambdaBasicExecutionRole
+      CodeUri: 's3://mohanias-cfn/formv3.zip'
+      Description: 'Form Function'
+      MemorySize: 128
+      Timeout: 10
+      Events:
+        LambdaAPI:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+            RestApiId: !Ref ApiResource
+  LambdaStatRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "sts:AssumeRole"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+      Policies: # Inline Policies
+        -
+          PolicyName: "GetMetricsPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "cloudwatch:GetMetricStatistics"
+                  - "cloudwatch:ListMetrics"
+                  - "ec2:DescribeRegions"
+                  - "ec2:DescribeNetworkInterfaces"
+                  - "ec2:DeleteNetworkInterface"
+                  - "lambda:InvokeFunction"
+                  - "lambda:ListFunctions"
+                  - "lambda:ListTags"
+                  - "logs:DescribeLogStreams"
+                Resource: "*"
+Outputs:
+  URL:
+    Description: 'APIGateway URL'
+    Value: !Join
+              - ''
+              - - 'https://'
+                - !Ref ApiResource
+                - '.execute-api.'
+                - !Ref AWS::Region
+                - '.amazonaws.com/prod/'
