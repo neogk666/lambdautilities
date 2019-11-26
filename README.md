@@ -54,3 +54,30 @@ Use-cases:
 
 1) Listing the ENIs used by lambda
 2) Delete the ENIs used by lambda, if lambda doesnt deleted automatically for some reason. Deletion of ENI is not required for AWS accounts which enabled for "VPC Improved networking for Lambda".
+
+
+
+How to Deploy: (Note - Deployment should be in N.Virginia region)
+
+1) Open Lambda Console
+2) Navigate to N.Virginia Region
+3) Choose - Crete Function
+4) Select "Browse serverless app repository"
+5) Tick "Show apps that create custom IAM roles or resource policies"
+6) Search "LambdaUtilities", and click on it.
+7) Click "I acknowledge this app creates custom IAM roles"
+8) click "Deploy"
+
+It may take a while to deploy.
+
+How to access the deployed application:
+
+1) On the "Deploy" page, click on "Test app" button once deployment is completed.
+2) Click the "API Endpoint" to access the application, on the next page.
+3) You have an option to choose the region where you want the choosen operation to be performed.
+
+You can Access the README.md file or any raise any issues at:
+https://github.com/neogk666/lambdautilities
+
+
+
