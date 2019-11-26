@@ -1,7 +1,7 @@
 # lambdautilities
 AWS Lambda Utilities
 
-Region : Sydney
+Region : N.Virginia
 
 I) Lambda Statistcis
 
