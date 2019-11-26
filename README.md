@@ -1,7 +1,8 @@
 # lambdautilities
 AWS Lambda Utilities
 
-Region : N.Virginia
+Region : N.Virginia (Deployment should be in this region)
+
 
 I) Lambda Statistcis
 
@@ -46,5 +47,10 @@ Important:
 Required Input:
 
 Region: Select the region where you want to look for the lambda ENIs used by lambda
-Metrics : Choose which metric aggregates you want to look for.
-Hours : Choose the search length. (Max 24 hours)
+Operation : Choose the operation - "List" or "Delete"
+Status : Choose which status ENI should be displayed. If the operation is "Delete" only "Avaialble" status is supported.
+
+Use-cases:
+
+1) Listing the ENIs used by lambda
+2) Delete the ENIs used by lambda, if lambda doesnt deleted automatically for some reason. Deletion of ENI is not required for AWS accounts which enabled for "VPC Improved networking for Lambda".
